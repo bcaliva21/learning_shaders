@@ -9,6 +9,17 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
+float circle(in vec2 _st, in float _radius){
+    vec2 dist = _st-vec2(.9);
+	return 1.-smoothstep(_radius*(_radius*0.2),
+					 _radius*(_radius*0.9),
+					 dot(dist,dist)*5.6);
+
+    // return 1.-smoothstep(_radius-(_radius*0.01),
+                         // _radius+(_radius*0.01),
+                         // dot(dist,dist)*4.0);
+}
+
 vec2 rotate2D (vec2 _st, float _angle) {
     _st -= 0.5;
     _st =  mat2(cos(_angle),-sin(_angle),
@@ -31,7 +42,7 @@ vec2 rotateTilePattern(vec2 _st){
     //  according to its position
     float index = 0.0;
     index += step(1., mod(_st.x,2.0));
-    index += step(1., mod(_st.y,2.0))*2.0;
+	index += step(1., mod(_st.y,2.0))*2.;
 
     //      |
     //  2   |   3
@@ -62,7 +73,7 @@ vec2 rotateTilePattern(vec2 _st){
 void main (void) {
     vec2 st = gl_FragCoord.xy/u_resolution.xy;
 
-    st = tile(st,3.0);
+    st = tile(st,5.0);
     st = rotateTilePattern(st);
 
     // Make more interesting combinations
@@ -70,9 +81,11 @@ void main (void) {
     // st = rotate2D(st,-PI*u_time*0.25);
     // st = rotateTilePattern(st*2.);
     // st = rotate2D(st,PI*u_time*0.25);
+    st = rotate2D(st,PI*sin(u_time)*0.25);
 
     // step(st.x,st.y) just makes a b&w triangles
     // but you can use whatever design you want.
-    gl_FragColor = vec4(vec3(step(st.x,st.y)),1.0);
+    // gl_FragColor = vec4(vec3(step(st.x,st.y)),1.0);
+    gl_FragColor = vec4(vec3(vec2(circle(st, .85)),.15),1.);
 }
 
